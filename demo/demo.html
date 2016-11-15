@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>catpl demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <script src="../src/catpl.js"></script>
+    <style type="text/css">
+        body{background:#fff7e9;}
+        body,button,input,select,textarea,table{font:14px/1.8 verdana,tahoma,Arial,\5FAE\8F6F\96C5\9ED1,\5B8B\4F53;}
+    </style>
+</head>
+<body>
+<img src="../catpl.png" width="200">
+<div id="content"></div>
+
+<script id="test" type="text/html">
+    <% if (isAdmin) { %>
+
+    <h1>标题<%=pt(title,"abcd")%></h1>
+    <% include('test2', subdata) %>
+    <ul>
+        <% for (var i = 0; i < list.length; i ++) { %>
+        <li>索引 <%= i + 1 %> ：<%= list[i] %></li>
+        <% } %>
+    </ul>
+
+    <% } %>
+</script>
+
+<script id="test2" type="text/html">
+    <h2><%=pt(title,'def')%></h2>
+    <ol>
+        <% for (var i = 0; i < list.length; i ++) { %>
+        <li>索引 <%= i + 1 %> ：<%= list[i] %></li>
+        <% } %>
+    </ol>
+</script>
+
+<script>
+    var data = {
+        title: '基本例子',
+        isAdmin: true,
+        list: ['文艺', '博客', '摄影', '电影', '民谣', '旅行', '吉他'],
+
+        subdata: {
+            title: '子模板',
+            list: ['文艺', '博客']
+        }
+    };
+
+    catpl.helper('pt', function (str, per) {
+        return per + str + per;
+    });
+
+    var html = catpl('test')(data);
+    document.getElementById('content').innerHTML = html;
+</script>
+</body>
+</html>
