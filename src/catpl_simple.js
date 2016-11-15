@@ -139,7 +139,7 @@
                 code_header += name + "=" + val + ",";
             });
 
-            return code.replace(/^\s*|\s*$|/g, '') + '\n';
+            return methods.$trim(code) + '\n';
         };
 
         var code_header = "'use strict'; var ";
@@ -185,8 +185,8 @@
 
     catpl.config = function (conf, value) {
         var set = function (conf, value) {
-            conf = conf.replace(/^\s*|\s*$/g, '');
-            options[conf] = /Tag$/.test(conf) ? value.replace(/^\s*|\s*$/g, '') : value;
+            conf = methods.$trim(conf);
+            options[conf] = /Tag$/.test(conf) ? methods.$trim(value) : value;
         };
         if (arguments.length === 2) {
             set(conf, value);
@@ -281,10 +281,10 @@
 
     if (typeof define === 'function') {
         define(function () {
-            return template;
+            return catpl;
         });
     } else if (typeof exports !== 'undefined') {
-        module.exports = template;
+        module.exports = catpl;
     } else {
         this.catpl = catpl;
     }
