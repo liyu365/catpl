@@ -5,71 +5,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <script src="../src/catpl.js"></script>
-    <style type="text/css">
-        body{background:#fff7e9;}
-        body,button,input,select,textarea,table{font:14px/1.8 verdana,tahoma,Arial,\5FAE\8F6F\96C5\9ED1,\5B8B\4F53;}
-    </style>
 </head>
 <body>
 <img src="../catpl.png" width="200">
 <div id="content"></div>
 
 <script id="test" type="text/html">
-
-    {{if isAdmin}}
-
-    <h1>{{#title | pt:'ko' | wrapper:':',':a'}}</h1>
-    {{include 'test2' subdata}}
+    <h2>{{title | addText:'列出' | addText2:'请','是什么:'}}</h2>
     <ul>
-        {{foreach list}}
-        <li>索引 {{$index + 1}} ：{{$value}}</li>
+        {{foreach sports as sport index}}
+            {{if sport.show}}
+                <li>{{index + 1}} : {{sport.name}}</li>
+            {{/if}}
         {{/foreach}}
     </ul>
-
-    {{/if}}
-
 </script>
-
-
-<script id="test2" type="text/html">
-
-
-
-    <h1>{{#title | pt:'ko' | wrapper:':',':a'}}</h1>
-    {{if isAdmin}}
-    <ul>
-        {{foreach list as value i}}
-        <li>索引 {{i + 1}} ：{{value}}</li>
-        {{/foreach}}
-    </ul>
-
-    {{/if}}
-
-</script>
-
 
 <script>
     var data = {
-        title: '基本例子',
-        isAdmin: true,
-        list: ['文艺', '博客', '摄影', '电影', '民谣', '旅行', '吉他'],
-
-        subdata: {
-            title: '子模板',
-            isAdmin: true,
-            list: ['文艺', '博客']
-        }
+        title: '你喜爱的运动',
+        sports: [
+            {name: '篮球', show: true},
+            {name: '足球', show: true},
+            {name: '滑冰', show: true},
+            {name: '骑马', show: false}
+        ]
     };
 
-    catpl.helper('wrapper',function(str,aler,three){
-        return '<div>' +aler + str + three+ '</div>';
-    });
-    catpl.helper('pt', function (str, per) {
-        return '<span style="color:#ccc;">' + str + per + '</span>';
+    catpl.helper('addText', function (str, prefix) {
+        return prefix + str;
     });
 
+    catpl.helper('addText2', function (str, prefix, suffix) {
+        return prefix + str + suffix;
+    });
 
-    var html = catpl('test')(data);
+    var engine = catpl('test');
+    var html = engine(data);
     document.getElementById('content').innerHTML = html;
 </script>
 </body>

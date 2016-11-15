@@ -106,9 +106,10 @@
 
         //处理模板字符串中的逻辑语句
         var handle_logic = function (code) {
-
-            code = options.syntax_hook(code);
-
+            //调用语法钩子
+            if(typeof options.syntax_hook == 'function'){
+                code = options.syntax_hook(code);
+            }
             //翻译形如 <%=name%> <%=#name> 的值输出语句
             if (code.indexOf('=') === 0) {
                 var needEscape = !/^=#/.test(code);
@@ -162,7 +163,7 @@
 
         var code = code_header + "$cat='';" + code_body + code_footer;
         code = "try{\n" + code + "\n}catch(e){if(typeof console === 'object'){console.error(e);}return 'catpl error'}";
-        console.log(code);
+        //console.log(code);
         var fun = new Function("$data", "$methods", "$helpers", code);
         return function (data) {
             return fun(data, methods, helpers);
@@ -212,6 +213,7 @@
         }
     };
 
+    //语法钩子函数
     options.syntax_hook = function (code) {
         code = methods.$trim(code);
         var frags = code.split(' ');
