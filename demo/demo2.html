@@ -19,7 +19,7 @@
 
     {{if isAdmin}}
 
-    <h1>{{#title | pt:'ko'}}</h1>
+    <h1>{{#title | pt:'ko' | wrapper:':',':a'}}</h1>
     <ul>
         {{each list as value i}}
         <li>索引 {{i + 1}} ：{{value}}</li>
@@ -48,9 +48,13 @@
         closeTag: ' }}'
     });
 
+    catpl.helper('wrapper',function(str,aler,three){
+        return '<div>' +aler + str + three+ '</div>';
+    });
     catpl.helper('pt', function (str, per) {
         return '<span style="color:#ccc;">' + str + per + '</span>';
     });
+
 
     var html = catpl('test')(data);
     document.getElementById('content').innerHTML = html;

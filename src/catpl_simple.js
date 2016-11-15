@@ -45,6 +45,12 @@
                 return escapeMap[match];
             });
         },
+        $trim: function (str) {
+            if(typeof str !== 'string'){
+                return '';
+            }
+            return str.replace(/^\s*|\s*$/g, '');
+        },
         $include: function (id, data) {
             return catpl(id)(data);
         }
@@ -206,29 +212,20 @@
         }
     };
 
-    var filtered = function (js, filter) {
-        var parts = filter.split(':');
-        var name = parts.shift();
-        var args = parts.join(':') || '';
-
-        if (args) {
-            args = ', ' + args;
-        }
-
-        return name + '(' + js + args + ')';
-    };
-
-
     options.syntax_hook = function (code) {
-        //console.log(code);
-        code = code.replace(/^\s*|\s*$/g, '');
-
-        var split = code.split(' ');
-        var key = split.shift();
-        var args = split.join(' ');
-
-        //console.error(args);
-
+        code = methods.$trim(code);
+        var frags = code.split(' ');
+        var key = frags.shift();
+        var args = frags.join(' ');
+        var filtered = function (data, filter) {
+            var arr = filter.split(':');  //根据冒号把filter字符串分割成数组，如果filter字符串中没有冒号则split()方法会返回包一个成员的数组，该成员为filter字符串
+            var fn_name = arr.shift();  //数组中的第一个成员为函数名，获取后从原数组删除
+            var args = arr.join(':') || '';  //剩余的数组成员还按照冒号拼合成原样，若数组中已经没有成员join()方法会返回空字符串
+            if (args) {
+                args = ',' + args;
+            }
+            return fn_name + '(' + data + args + ')';
+        };
         switch (key) {
             case 'if':
                 code = 'if(' + args + '){';
@@ -236,8 +233,8 @@
             case 'else':
                 //分为else if和else两种情况
                 var txt;
-                if (split.shift() === 'if') {
-                    txt = ' if(' + split.join(' ') + ')';
+                if (frags.shift() === 'if') {
+                    txt = ' if(' + frags.join(' ') + ')';
                 } else {
                     txt = '';
                 }
@@ -247,10 +244,10 @@
                 code = '}';
                 break;
             case 'each':
-                var object = split[0] || '$data';
-                var as = split[1];
-                var value = split[2] || '$value';
-                var index = split[3] || '$index';
+                var object = frags[0] || '$data';
+                var as = frags[1];
+                var value = frags[2] || '$value';
+                var index = frags[3] || '$index';
                 var param = value + ',' + index;
                 as === 'as' || (object = '[]');
                 code = '$foreach(' + object + ',function(' + param + '){';
@@ -259,43 +256,26 @@
                 code = '});';
                 break;
             case 'include':
-                code = key + '(' + split.join(',') + ');';
+                code = key + '(' + frags.join(',') + ');';
                 break;
             default:
-                console.log(args);
-                // 过滤器（辅助方法）
-                // {{value | filterA:'abcd' | filterB}}
-                // >>> $helpers.filterB($helpers.filterA(value, 'abcd'))
-                // TODO: {{ddd||aaa}} 不包含空格
                 if (/^\s*\|\s*[\w\$]/.test(args)) {
-
                     var escape = true;
-
-                    // {{#value | link}}
                     if (code.indexOf('#') === 0) {
                         code = code.substr(1);
                         escape = false;
                     }
-
-                    var i = 0;
                     var array = code.split('|');
-                    var len = array.length;
-                    var val = array[i++];
-
-                    for (; i < len; i++) {
-                        val = filtered(val, array[i]);
+                    var val = methods.$trim(array[0]);
+                    for (var i = 1, len = array.length; i < len; i++) {
+                        val = filtered(val, methods.$trim(array[i]));
                     }
-
                     code = (escape ? '=' : '=#') + val;
                 } else {
-
                     code = '=' + code;
                 }
-
                 break;
         }
-
-
         return code;
     };
 
