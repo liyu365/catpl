@@ -17,7 +17,7 @@
 <script id="test" type="text/html">
     <% if (isAdmin) { %>
 
-    <h1>标题<%=pt(title,"abcd")%></h1>
+    <h1>标题<%=#pt(title,"abcd")%></h1>
     <% include('test2', subdata) %>
     <ul>
         <% for (var i = 0; i < list.length; i ++) { %>
@@ -50,7 +50,7 @@
     };
 
     catpl.helper('pt', function (str, per) {
-        return per + str + per;
+        return '<span style="color:#ccc;">' + str + '</span>';
     });
 
     var html = catpl('test')(data);
