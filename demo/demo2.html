@@ -19,7 +19,7 @@
 
     {{if isAdmin}}
 
-    <h1>{{title}}</h1>
+    <h1>{{#title | pt:'ko'}}</h1>
     <ul>
         {{each list as value i}}
         <li>索引 {{i + 1}} ：{{value}}</li>
@@ -45,11 +45,11 @@
 
     catpl.config({
         openTag: '{{',
-        closeTag: '}}'
+        closeTag: ' }}'
     });
 
     catpl.helper('pt', function (str, per) {
-        return '<span style="color:#ccc;">' + str + '</span>';
+        return '<span style="color:#ccc;">' + str + per + '</span>';
     });
 
     var html = catpl('test')(data);

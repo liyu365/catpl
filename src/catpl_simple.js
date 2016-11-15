@@ -156,7 +156,7 @@
 
         var code = code_header + "$cat='';" + code_body + code_footer;
         code = "try{\n" + code + "\n}catch(e){if(typeof console === 'object'){console.error(e);}return 'catpl error'}";
-        //console.log(code);
+        console.log(code);
         var fun = new Function("$data", "$methods", "$helpers", code);
         return function (data) {
             return fun(data, methods, helpers);
@@ -178,15 +178,9 @@
     };
 
     catpl.config = function (conf, value) {
-        var escapePattern = function (str) {
-            return str;
-            return str.replace(/[\^\$\(\)\[\]\{\+\-\?\*\.\|\\\/]/igm, function (match) {
-                return '\\' + match;
-            });
-        };
         var set = function (conf, value) {
-            conf.replace(/^\s*|\s*$/g, '');
-            options[conf] = /Tag$/.test(conf) ? escapePattern(value) : value;
+            conf = conf.replace(/^\s*|\s*$/g, '');
+            options[conf] = /Tag$/.test(conf) ? value.replace(/^\s*|\s*$/g, '') : value;
         };
         if (arguments.length === 2) {
             set(conf, value);
@@ -197,7 +191,7 @@
                 }
             }
         }
-        console.log(options);
+        //console.log(options);
     };
 
     catpl.helper = function (name, fun) {
@@ -207,7 +201,7 @@
     catpl.deleteCache = function (key) {
         if (typeof key === 'undefined') {
             cache = {};
-        }else if(cache.hasOwnProperty(key)){
+        } else if (cache.hasOwnProperty(key)) {
             delete cache[key];
         }
     };
@@ -221,83 +215,54 @@
             args = ', ' + args;
         }
 
-        return '$helpers.' + name + '(' + js + args + ')';
-    }
+        return name + '(' + js + args + ')';
+    };
 
 
-    options.syntax_hook = function (code, options) {
-
-        // var match = code.match(/([\w\$]*)(\b.*)/);
-        // var key = match[1];
-        // var args = match[2];
-        // var split = args.split(' ');
-        // split.shift();
-
-        code = code.replace(/^\s/, '');
+    options.syntax_hook = function (code) {
+        //console.log(code);
+        code = code.replace(/^\s*|\s*$/g, '');
 
         var split = code.split(' ');
         var key = split.shift();
         var args = split.join(' ');
 
-
+        //console.error(args);
 
         switch (key) {
-
             case 'if':
-
                 code = 'if(' + args + '){';
                 break;
-
             case 'else':
-
+                //分为else if和else两种情况
+                var txt;
                 if (split.shift() === 'if') {
-                    split = ' if(' + split.join(' ') + ')';
+                    txt = ' if(' + split.join(' ') + ')';
                 } else {
-                    split = '';
+                    txt = '';
                 }
-
-                code = '}else' + split + '{';
+                code = '}else' + txt + '{';
                 break;
-
             case '/if':
-
                 code = '}';
                 break;
-
             case 'each':
-
                 var object = split[0] || '$data';
-                var as     = split[1] || 'as';
-                var value  = split[2] || '$value';
-                var index  = split[3] || '$index';
-
-                var param   = value + ',' + index;
-
-                if (as !== 'as') {
-                    object = '[]';
-                }
-
-                code =  '$foreach(' + object + ',function(' + param + '){';
+                var as = split[1];
+                var value = split[2] || '$value';
+                var index = split[3] || '$index';
+                var param = value + ',' + index;
+                as === 'as' || (object = '[]');
+                code = '$foreach(' + object + ',function(' + param + '){';
                 break;
-
             case '/each':
-
                 code = '});';
                 break;
-
-            case 'echo':
-
-                code = 'print(' + args + ');';
-                break;
-
-            case 'print':
             case 'include':
-
                 code = key + '(' + split.join(',') + ');';
                 break;
-
             default:
-
+                console.log(args);
                 // 过滤器（辅助方法）
                 // {{value | filterA:'abcd' | filterB}}
                 // >>> $helpers.filterB($helpers.filterA(value, 'abcd'))
@@ -317,18 +282,11 @@
                     var len = array.length;
                     var val = array[i++];
 
-                    for (; i < len; i ++) {
+                    for (; i < len; i++) {
                         val = filtered(val, array[i]);
                     }
 
                     code = (escape ? '=' : '=#') + val;
-
-                    // 即将弃用 {{helperName value}}
-                } else if (helpers[key]) {
-
-                    code = '=#' + key + '(' + split.join(',') + ');';
-
-                    // 内容直接输出 {{value}}
                 } else {
 
                     code = '=' + code;
