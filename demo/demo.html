@@ -15,27 +15,38 @@
 <div id="content"></div>
 
 <script id="test" type="text/html">
-    <% if (isAdmin) { %>
 
-    <h1>标题<%=#pt(title,"abcd")%></h1>
-    <% include('test2', subdata) %>
+    {{if isAdmin}}
+
+    <h1>{{#title | pt:'ko' | wrapper:':',':a'}}</h1>
+    {{include 'test2' subdata}}
     <ul>
-        <% for (var i = 0; i < list.length; i ++) { %>
-        <li>索引 <%= i + 1 %> ：<%= list[i] %></li>
-        <% } %>
+        {{foreach list}}
+        <li>索引 {{$index + 1}} ：{{$value}}</li>
+        {{/foreach}}
     </ul>
 
-    <% } %>
+    {{/if}}
+
 </script>
 
+
 <script id="test2" type="text/html">
-    <h2><%=pt(title,'def')%></h2>
-    <ol>
-        <% for (var i = 0; i < list.length; i ++) { %>
-        <li>索引 <%= i + 1 %> ：<%= list[i] %></li>
-        <% } %>
-    </ol>
+
+
+
+    <h1>{{#title | pt:'ko' | wrapper:':',':a'}}</h1>
+    {{if isAdmin}}
+    <ul>
+        {{foreach list as value i}}
+        <li>索引 {{i + 1}} ：{{value}}</li>
+        {{/foreach}}
+    </ul>
+
+    {{/if}}
+
 </script>
+
 
 <script>
     var data = {
@@ -45,13 +56,18 @@
 
         subdata: {
             title: '子模板',
+            isAdmin: true,
             list: ['文艺', '博客']
         }
     };
 
-    catpl.helper('pt', function (str, per) {
-        return '<span style="color:#ccc;">' + str + '</span>';
+    catpl.helper('wrapper',function(str,aler,three){
+        return '<div>' +aler + str + three+ '</div>';
     });
+    catpl.helper('pt', function (str, per) {
+        return '<span style="color:#ccc;">' + str + per + '</span>';
+    });
+
 
     var html = catpl('test')(data);
     document.getElementById('content').innerHTML = html;

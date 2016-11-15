@@ -1,8 +1,8 @@
 (function () {
 
     var options = {
-        openTag: '<%',
-        closeTag: '%>',
+        openTag: '{{',
+        closeTag: '}}',
         syntax_hook: null
     };
 
@@ -44,6 +44,12 @@
             return methods.$toString(content).replace(/&(?![\w#]+;)|[<>"']/g, function (match) {
                 return escapeMap[match];
             });
+        },
+        $trim: function (str) {
+            if(typeof str !== 'string'){
+                return '';
+            }
+            return str.replace(/^\s*|\s*$/g, '');
         },
         $include: function (id, data) {
             return catpl(id)(data);
@@ -100,6 +106,9 @@
 
         //处理模板字符串中的逻辑语句
         var handle_logic = function (code) {
+
+            code = options.syntax_hook(code);
+
             //翻译形如 <%=name%> <%=#name> 的值输出语句
             if (code.indexOf('=') === 0) {
                 var needEscape = !/^=#/.test(code);
@@ -130,7 +139,7 @@
                 code_header += name + "=" + val + ",";
             });
 
-            return code.replace(/^\s*|\s*$|/g, '') + '\n';
+            return methods.$trim(code) + '\n';
         };
 
         var code_header = "'use strict'; var ";
@@ -153,7 +162,7 @@
 
         var code = code_header + "$cat='';" + code_body + code_footer;
         code = "try{\n" + code + "\n}catch(e){if(typeof console === 'object'){console.error(e);}return 'catpl error'}";
-        //console.log(code);
+        console.log(code);
         var fun = new Function("$data", "$methods", "$helpers", code);
         return function (data) {
             return fun(data, methods, helpers);
@@ -175,14 +184,9 @@
     };
 
     catpl.config = function (conf, value) {
-        var escapePattern = function (str) {
-            return str.replace(/[\^\$\(\)\[\]\{\+\-\?\*\.\|\\\/]/igm, function (match) {
-                return '\\' + match;
-            });
-        };
         var set = function (conf, value) {
-            conf.replace(/^\s*|\s*$/g, '');
-            options[conf] = /Tag$/.test(conf) ? escapePattern(value) : value;
+            conf = methods.$trim(conf);
+            options[conf] = /Tag$/.test(conf) ? methods.$trim(value) : value;
         };
         if (arguments.length === 2) {
             set(conf, value);
@@ -203,17 +207,86 @@
     catpl.deleteCache = function (key) {
         if (typeof key === 'undefined') {
             cache = {};
-        }else if(cache.hasOwnProperty(key)){
+        } else if (cache.hasOwnProperty(key)) {
             delete cache[key];
         }
     };
 
+    options.syntax_hook = function (code) {
+        code = methods.$trim(code);
+        var frags = code.split(' ');
+        var key = frags.shift();
+        var args = frags.join(' ');
+        var decorator = function (data, filter) {
+            var arr = filter.split(':');  //根据冒号把filter字符串分割成数组，如果filter字符串中没有冒号则split()方法会返回包一个成员的数组，该成员为filter字符串
+            var fn_name = arr.shift();  //数组中的第一个成员为函数名，获取后从原数组删除
+            var args = arr.join(':') || '';  //剩余的数组成员还按照冒号拼合成原样，若数组中已经没有成员join()方法会返回空字符串
+            if (args) {
+                args = ',' + args;
+            }
+            return fn_name + '(' + data + args + ')';
+        };
+        switch (key) {
+            case 'if':
+                code = 'if(' + args + '){';
+                break;
+            case 'else':
+                //分为else if和else两种情况
+                var txt;
+                if (frags.shift() === 'if') {
+                    txt = ' if(' + frags.join(' ') + ')';
+                } else {
+                    txt = '';
+                }
+                code = '}else' + txt + '{';
+                break;
+            case '/if':
+                code = '}';
+                break;
+            case 'foreach':
+                var object = frags[0] || '$data';
+                var as = frags[1];
+                var value = frags[2] || '$value';
+                var index = frags[3] || '$index';
+                var param = value + ',' + index;
+                if(as && as !=='as'){
+                    object = '[]';
+                }
+                code = '$foreach(' + object + ',function(' + param + '){';
+                break;
+            case '/foreach':
+                code = '});';
+                break;
+            case 'include':
+                code = key + '(' + frags.join(',') + ');';
+                break;
+            default:
+                if (/^\s*\|\s*[\w\$]/.test(args)) {
+                    var escape = true;
+                    if (code.indexOf('#') === 0) {
+                        code = code.substr(1);
+                        escape = false;
+                    }
+                    var array = code.split('|');
+                    var val = methods.$trim(array[0]);
+                    for (var i = 1, len = array.length; i < len; i++) {
+                        val = decorator(val, methods.$trim(array[i]));
+                    }
+                    code = (escape ? '=' : '=#') + val;
+                } else {
+                    code = '=' + code;
+                }
+                break;
+        }
+        return code;
+    };
+
     if (typeof define === 'function') {
         define(function () {
-            return template;
+            return catpl;
         });
     } else if (typeof exports !== 'undefined') {
-        module.exports = template;
+        module.exports = catpl;
     } else {
         this.catpl = catpl;
     }
