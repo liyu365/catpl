@@ -1,4 +1,4 @@
-(function () {
+!(function () {
 
     var options = {
         openTag: '{{',
@@ -46,7 +46,7 @@
             });
         },
         $trim: function (str) {
-            if(typeof str !== 'string'){
+            if (typeof str !== 'string') {
                 return '';
             }
             return str.replace(/^\s*|\s*$/g, '');
@@ -107,7 +107,7 @@
         //处理模板字符串中的逻辑语句
         var handle_logic = function (code) {
             //调用语法钩子
-            if(typeof options.syntax_hook == 'function'){
+            if (typeof options.syntax_hook == 'function') {
                 code = options.syntax_hook(code);
             }
             //翻译形如 <%=name%> <%=#name> 的值输出语句
@@ -174,7 +174,10 @@
         if (cache[tpl]) {
             return cache[tpl];
         }
-        var element = document.getElementById(tpl);
+        var element = null;
+        if (typeof window.document !== 'undefined') {
+            element = document.getElementById(tpl);
+        }
         if (element) {
             var source = (element.value || element.innerHTML);
             var fn = compile(source);
@@ -251,7 +254,7 @@
                 var value = frags[2] || '$value';
                 var index = frags[3] || '$index';
                 var param = value + ',' + index;
-                if(as && as !=='as'){
+                if (as && as !== 'as') {
                     object = '[]';
                 }
                 code = '$foreach(' + object + ',function(' + param + '){';

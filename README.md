@@ -1,11 +1,11 @@
-#catpl，一个快速可靠地 javascript 模板引擎
+#catpl，一个快速可靠的 javascript 模板引擎
 
 ##1.简述
 
 ![catpl](https://liyu365.github.io/catpl/catpl.png)
 
 本项目借鉴自artTemplate、juicer、laytpl等诸多项目，在学习这些项目的过程中编写而成。
-并且项目中有大量注释，可以用来学习 javascript 模板引擎的编写。
+源码中有大量注释，可以用来学习 javascript 模板引擎的编写。
 
 ##2.使用方式
 
@@ -119,3 +119,7 @@ catpl.helper('fun_name', function (date, param) {
 ```
 
 > 注意 '|' 字符左右的空格不能缺少
+
+##9.License
+
+**Under MIT license. Copyright by 李昱(liyu365)**
