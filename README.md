@@ -35,7 +35,7 @@ catpl.set('openTag', '{{')
 ```
 catpl.set({
     openTag : '{{' ,
-    closeTag : ''
+    closeTag : '}}'
 })
 ```
 
