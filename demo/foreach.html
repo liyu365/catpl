@@ -10,12 +10,22 @@
 <div id="content"></div>
 
 <script id="test" type="text/html">
-<h1>{{title}}</h1>
+    <h1>{{title}}</h1>
+    <ul>
+        {{foreach sports as value i}}
+        <li>{{i+1}} - {{value.name}}</li>
+        {{/foreach}}
+    </ul>
 </script>
 
 <script>
     var data = {
-        title: 'catpl模板引擎'
+        title: '你喜爱的运动',
+        sports: [
+            {name: '足球'},
+            {name: '篮球'},
+            {name: '乒乓球'}
+        ]
     };
 
     var render = catpl('test');

@@ -8,41 +8,12 @@
 </head>
 <body>
 <img src="../catpl.png">
-<div id="content"></div>
-
-<script id="test" type="text/html">
-    <h2>{{title | addText:'列出' | addText2:'请','是什么:'}}</h2>
-    <ul>
-        {{foreach sports as sport index}}
-            {{if sport.show}}
-                <li>{{index + 1}} : {{sport.name}}</li>
-            {{/if}}
-        {{/foreach}}
-    </ul>
-</script>
-
-<script>
-    var data = {
-        title: '你喜爱的运动',
-        sports: [
-            {name: '篮球', show: true},
-            {name: '足球', show: true},
-            {name: '滑冰', show: true},
-            {name: '骑马', show: false}
-        ]
-    };
-
-    catpl.helper('addText', function (str, prefix) {
-        return prefix + str;
-    });
-
-    catpl.helper('addText2', function (str, prefix, suffix) {
-        return prefix + str + suffix;
-    });
-
-    var engine = catpl('test');
-    var html = engine(data);
-    document.getElementById('content').innerHTML = html;
-</script>
+<ul>
+    <li><a href="./basic.html">basic.html</a></li>
+    <li><a href="./if.html">if.html</a></li>
+    <li><a href="./foreach.html">foreach.html</a></li>
+    <li><a href="./include.html">include.html</a></li>
+    <li><a href="./helper.html">helper.html</a></li>
+</ul>
 </body>
 </html>

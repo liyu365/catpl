@@ -10,12 +10,20 @@
 <div id="content"></div>
 
 <script id="test" type="text/html">
-<h1>{{title}}</h1>
+    <h1>
+        {{if flag===1}}
+        flag的值为1
+        {{else if flag ===2}}
+        flag的值为2
+        {{else}}
+        flag的值为其他
+        {{/if}}
+    </h1>
 </script>
 
 <script>
     var data = {
-        title: 'catpl模板引擎'
+        flag: 1
     };
 
     var render = catpl('test');
