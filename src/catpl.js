@@ -165,7 +165,7 @@
 
         var code = code_header + "$cat='';\n" + code_body + code_footer;
         code = "try{\n" + code + "\n}catch(e){if(typeof console === 'object'){console.error(e);}return 'catpl error'}";
-        console.log(code);
+        //console.log(code);
         var fun = new Function("$data", "$methods", "$helpers", code);
         return function (data) {
             return fun(data, methods, helpers);
