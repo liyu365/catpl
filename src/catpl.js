@@ -127,8 +127,10 @@
                     return;
                 }
                 var val = '';
-                if (name === 'include') {
-                    val = "function(id,data){var data = data|| $data;var txt=$methods.$include(id,data);$cat+=txt;}";
+                if(name ==='$cat'){
+                    return;
+                }else if (name === 'include') {
+                    val = "function(id,data){var data=data||$data;var txt=$methods.$include(id,data);$cat+=txt;}";
                 } else if (methods[name]) {
                     val = "$methods." + name;
                 } else if (helpers[name]) {
@@ -161,7 +163,7 @@
             }
         });
 
-        var code = code_header + "$cat='';" + code_body + code_footer;
+        var code = code_header + "$cat='';\n" + code_body + code_footer;
         code = "try{\n" + code + "\n}catch(e){if(typeof console === 'object'){console.error(e);}return 'catpl error'}";
         //console.log(code);
         var fun = new Function("$data", "$methods", "$helpers", code);
