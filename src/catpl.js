@@ -225,9 +225,9 @@
         var key = frags.shift();
         var args = frags.join(' ');
         var decorator = function (data, filter) {
-            var arr = filter.split(':');  //根据冒号把filter字符串分割成数组，如果filter字符串中没有冒号则split()方法会返回包一个成员的数组，该成员为filter字符串
+            var arr = filter.split(':');  //根据冒号把filter字符串分割成数组，如果filter字符串中没有冒号则split()方法会返回只包含一个成员的数组，该成员为filter字符串
             var fn_name = arr.shift();  //数组中的第一个成员为函数名，获取后从原数组删除
-            var args = arr.join(':') || '';  //剩余的数组成员还按照冒号拼合成原样，若数组中已经没有成员join()方法会返回空字符串
+            var args = arr.join('') || '';  //此时的arr形如["'param1, param2'"]或[]，用join方法把这个数组再变为字符串
             if (args) {
                 args = ',' + args;
             }
