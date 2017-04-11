@@ -7,9 +7,9 @@
 本项目借鉴自artTemplate、juicer、laytpl等诸多项目，在学习这些项目的过程中编写而成。
 源码中有大量注释，可以用来学习 javascript 模板引擎的编写。
 
-[演示地址](https://liyu365.github.io/catpl/demo/)
+:point_right: [演示地址](https://liyu365.github.io/catpl/demo/)
 
-[学习笔记](https://segmentfault.com/a/1190000007498585)
+:point_right: [学习笔记](https://segmentfault.com/a/1190000007498585)
 
 ## 2.使用方式
 
