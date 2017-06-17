@@ -13,7 +13,7 @@
     <h1>{{title}}</h1>
     <ul>
         {{foreach sports as value i}}
-        <li>{{i+1}} - {{value.name}}</li>
+        <li class="{{if i===index}}active{{/if}}">{{i+1}} - {{value.name}}</li>
         {{/foreach}}
     </ul>
 </script>
@@ -25,7 +25,8 @@
             {name: '足球'},
             {name: '篮球'},
             {name: '乒乓球'}
-        ]
+        ],
+        index: 1
     };
 
     var render = catpl('test');
